@@ -84,15 +84,24 @@ const router = createRouter({
 // check to see if the route requires authentication 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.auth)) {
-      // console.log("current user: " , firebase.auth().currentUser);
-      if (firebase.auth().currentUser) {
+      // if (firebase.auth().currentUser) {
+      //     next();
+      // } else {
+      //     alert('You must be logged in to see this page');
+      //     next({
+      //         path: '/',
+      //     });
+      // }
+      firebase.auth().onAuthStateChanged( (user) => {
+        if (user) {
           next();
-      } else {
-          // alert('You must be logged in to see this page');
+        } else {
+          alert('You must be logged in to see this page');
           next({
               path: '/',
           });
-      }
+        }
+      });
   } else {
       next();
   }

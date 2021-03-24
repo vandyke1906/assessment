@@ -48,13 +48,23 @@ export default {
         const fullName = `Ronie Penara`;
 
         function loadUserDetails(){
-          // let userId = "-MWWyf1bW1ib3anKqywc";  //should be set once login
-          let userId = firebase.auth().currentUser.uid;
-          var itemRef = database.ref('users/'+userId);
-          itemRef.on('value', (snapshot) => {
-              const data = snapshot.val();
-              state.user = data;
-          });
+        //   let userId = firebase.auth().currentUser.uid;
+        //   var itemRef = database.ref('users/'+userId);
+        //   itemRef.on('value', (snapshot) => {
+        //       const data = snapshot.val();
+        //       state.user = data;
+        //   });
+            firebase.auth().onAuthStateChanged( (user) => {
+                if (user) {
+                    var itemRef = database.ref('users/'+user.uid);
+                    itemRef.on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        state.user = data;
+                    });
+                } else {
+                console.log("No User!");
+                }
+            });
         }
 
         //###

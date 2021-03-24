@@ -87,9 +87,15 @@ export default {
     }
 
     onMounted(() => {
-        // console.log(firebase.auth().currentUser.uid);
-        const userId = firebase.auth().currentUser.uid;
-        loadContacts(userId);
+        // const userId = firebase.auth().currentUser.uid;
+        // loadContacts(userId);
+         firebase.auth().onAuthStateChanged( (user) => {
+            if (user) {
+                loadContacts(user.uid);
+            } else {
+            console.log("No User!");
+            }
+        });
     })
 
     return{
