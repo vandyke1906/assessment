@@ -1,10 +1,46 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </div>
-  <router-view/>
+<div id="nav">
+  <router-link to="/">Login</router-link> |
+  <router-link to="/register">Register</router-link> |
+  <router-link to="/dashboard">Dashboard</router-link> |
+  <router-link to="/contacts/list">Contacts</router-link> |
+  <!-- <router-link to="/chat">Chat</router-link> | -->
+  <button @click="logout">Logout</button>
+</div>
+
+  <router-view />
+  
 </template>
+
+<script>
+import firebase from 'firebase';
+import { useRouter } from "vue-router";
+
+export default {
+    setup(){
+      
+      const router = useRouter();
+    
+      function logout() {
+        firebase
+          .auth()
+          .signOut()
+          .then(() => {
+              alert('Successfully logged out');
+               router.push({ name: "login" });
+          })
+          .catch(error => {
+              alert(error.message);
+               router.push({ name: "login" });
+          });
+        }
+
+      return {
+        logout,
+      }
+    }
+};
+</script>
 
 <style>
 #app {
@@ -27,4 +63,9 @@
 #nav a.router-link-exact-active {
   color: #42b983;
 }
+
+input {   
+  margin-right: 20px; 
+}
+
 </style>
