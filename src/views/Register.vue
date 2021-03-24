@@ -3,6 +3,18 @@
     <form @submit.prevent="register">
       <h2>Register</h2>
       <input
+        name="fullName"
+        type="text"
+        placeholder="Full Name..."
+        v-model="state.fullName"
+      />
+      <input
+        name="username"
+        type="text"
+        placeholder="Username..."
+        v-model="state.username"
+      />
+      <input
         name="email"
         type="email"
         placeholder="Email address..."
@@ -26,9 +38,11 @@ import { useRouter } from "vue-router";
 
 export default {
   setup(){
-    
+
     const router = useRouter();
     const state = reactive({
+      username: "",
+      fullName: "",
       email: "",
       password: ""
     });
@@ -38,7 +52,17 @@ export default {
       .auth()
       .createUserWithEmailAndPassword(state.email, state.password)
       .then(() => {
+        var _uid = firebase.auth().currentUser.uid;
         alert('Successfully registered! Please login.');
+        //add in database
+        const _user = {
+          username: state.username,
+          fullName: state.fullName,
+          email: state.email,
+        };
+
+        firebase.database().ref(`users/${_uid}`).set(_user);
+
         router.push({ name: "Dashboard" });
       })
       .catch(error => {

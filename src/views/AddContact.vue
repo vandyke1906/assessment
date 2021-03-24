@@ -48,7 +48,7 @@
                                 <td>{{ user.firstName }} {{ user.lastName }}</td>
                                 <td>{{ user.email }}</td>
                                 <td>
-                                    <button class="btn btn-danger">Add</button> <!-- @click.prevent="deleteContact(contact.key)"  -->
+                                    <button @click.prevent="addContact1(user)" class="btn btn-danger">Add</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -85,21 +85,37 @@ export default {
     const database = firebase.database();
 
     function searchUser(){
-        // console.log('test');
-
-        // database.ref("users").orderByChild("childNode").startAt("[a-zA-Z0-9]*").endAt(searchString)
-
-        // const  itemsRef = database.ref("users").orderByChild("email").startAt(`%${state.searchString}`);
         let queryText = state.searchString;
         const  itemsRef = database.ref("users").orderByChild("email").startAt(queryText).endAt(queryText+"\uf8ff")
-        // itemsRef.once('value', function(snapshot) {
-        //     snapshot.forEach(function(childSnapshot) {
-        //             console.log(childSnapshot.val());
-        //     })
-        // })
+
           itemsRef.on('value', (snapshot) => {
-              const data = _.filter(snapshot.val(), function(o) { return o.email != firebase.auth.email ; }); //snapshot.val();
-              state.users = data;
+            //   state.users = data;
+
+            // let _users = [];
+            // _.forEach( snapshot_values, function(value, key) {
+            //     const _user = {
+            //         key: _key,
+            //     };
+            //     _users.push(_user);
+            // });
+
+            let _users = [];
+            snapshot.forEach(function(obj) {
+                 const _user = { 
+                    key: obj.key, 
+                    username: obj.val().username, 
+                    fullName: obj.val().fullName, 
+                    email: obj.val().email, 
+                }
+                _users.push(_user);
+            });
+            state.users = _users;
+
+            _.filter(snapshot.val(), function(obj) {
+                return obj.email != firebase.auth.email ; 
+            }); //snapshot.val();
+            // state.users = _users;
+
           });
     }
 
@@ -118,9 +134,24 @@ export default {
         router.push({ name: "Contacts" });
     }
 
+    function addContact1(user) {
+        const _user = {
+            email: user.email,
+            fullName: user.fullName,
+            username: user.username
+        };
+        //   console.log(firebase.auth().currentUser.uid);
+        // console.log('key', userKey);
+      database.ref(`contacts/${firebase.auth().currentUser.uid}/${user.key}`).set(_user);
+
+        alert('Successfully added contact');
+        router.push({ name: "Contacts" });
+    }
+
     return{
       state,
       addContact,
+      addContact1,
       searchUser,
     }
   }

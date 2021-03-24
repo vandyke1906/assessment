@@ -48,7 +48,8 @@ export default {
         const fullName = `Ronie Penara`;
 
         function loadUserDetails(){
-          let userId = "-MWWyf1bW1ib3anKqywc";  //should be set once login
+          // let userId = "-MWWyf1bW1ib3anKqywc";  //should be set once login
+          let userId = firebase.auth().currentUser.uid;
           var itemRef = database.ref('users/'+userId);
           itemRef.on('value', (snapshot) => {
               const data = snapshot.val();

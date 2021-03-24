@@ -1,6 +1,9 @@
 <template>
     <router-link to="/contacts">Add Contact</router-link>
-    <div class="row">
+    <div class="posts-wrapper">
+           <contact-detail v-for="contact in state.contacts" :key="contact.key" :userId="state.userId" :contact="contact" />  <!--  @toggle-favorite="toggleFavorite"/> -->
+    </div>
+    <!-- <div class="row">
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -23,7 +26,7 @@
                     </tr>
                 </tbody>
             </table>
-    </div>
+    </div> -->
 </template>
 
 <script>
@@ -32,12 +35,17 @@ import firebase from "firebase";
 // import { useRouter } from "vue-router";
 import { reactive, onMounted } from "vue";
 
+import ContactDetail from '@/components/ContactDetail'
+
 export default {
+    components: {
+      ContactDetail
+    },
   setup(){
-    
     // const router = useRouter();
     const state = reactive({
-        contacts: []
+        contacts: [],
+        userId: "",
     });
 
     function deleteContact(id){
@@ -58,27 +66,38 @@ export default {
 
     function loadContacts(){
         state.contacts = [];
-        const itemsRef = firebase.database().ref("contacts");
-        itemsRef.once('value', function(snapshot) {
-            // var messages = [];
+        // const uid = state.userid;
+        const itemRef = firebase.database().ref(`contacts/s`);
 
-            snapshot.forEach(function(childSnapshot) {
-                // var key = childSnapshot.key;
-                // var data = childSnapshot.val();
-                // console.log(key, data);
-                
-                 state.contacts.push({
-                    key: childSnapshot.key,
-                    name: childSnapshot.val().name,
-                    email: childSnapshot.val().email,
-                    phone: childSnapshot.val().phone
-                });
-            });
-        
+         itemRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            console.log(data);
+            state.contacts = data;
         });
+        // itemsRef.once('value', function(snapshot) {
+        //     // var messages = [];
+
+        //     snapshot.forEach(function(childSnapshot) {
+        //         // var key = childSnapshot.key;
+        //         // var data = childSnapshot.val();
+        //         // console.log(key, data);
+                
+        //          state.contacts.push({
+        //             key: childSnapshot.key,
+        //             name: childSnapshot.val().name,
+        //             email: childSnapshot.val().email,
+        //             phone: childSnapshot.val().phone
+        //         });
+        //     });
+
+        //     // console.log(state.contacts);
+        
+        // });
     }
 
     onMounted(() => {
+        // state.userid = firebase.auth().currentUser.uid;
+        // console.log(firebase.auth().currentUser.uid);
         loadContacts();
     })
 
