@@ -11,7 +11,7 @@
             v-for="message in state.messages"
             :key="message.key"
           >
-            
+            <p>{{message}}</p>
             <p class="message pt-1"><span class="mg-text">{{ message.name }}: ({{ message.time }})</span>{{ message.text }}</p>
           </div>
         </div>
@@ -46,13 +46,11 @@ export default {
     const database = firebase.database();
     const messaging = firebase.messaging();
     
-
+   
     // mounted
     onMounted(() => {      
       state.to = route.params.key;
-      // getUser(route.params.key);
 
-      //console.log(firebase.auth().currentUser.uid);
       const currentUid = firebase.auth().currentUser.uid;
 
       getUser(currentUid).then((snapshot) => {
@@ -64,6 +62,27 @@ export default {
           state.contactUser = snapshot.val(); 
         }
       );
+
+      // getUser(route.params.key);
+
+      //console.log(firebase.auth().currentUser.uid);
+      // const currentUid = firebase.auth().currentUser.uid;
+
+      // getUser(currentUid).then((snapshot) => {
+      //     state.currentUser = snapshot.val(); 
+      //   }
+      // );
+
+      // getUser(route.params.key).then((snapshot) => {
+      //     state.contactUser = snapshot.val(); 
+      //   }
+      // );
+
+      // const currentUserArray = [state.currentUser.username, state.contactUser.username];
+      // console.log(currentUserArray);
+      // getChatKey(currentUserArray);
+
+      
       
 
       messaging.getToken();
@@ -73,16 +92,16 @@ export default {
         itemsRef.once('value', function(snapshot) {
 
         snapshot.forEach(function(childSnapshot) {
-          var date = new Date(childSnapshot.val().time);
-          // console.log(childSnapshot.val());
-          state.messages.push({ 
-            // key: childSnapshot.key, 
-            // from: childSnapshot.val().from, 
-            // to: childSnapshot.val().to, 
-            username: childSnapshot.val().username,
-            message: childSnapshot.val().message,
-            time: date.toLocaleString("en-US"),
-          });
+          // var date = new Date(childSnapshot.val().time);
+          console.log(childSnapshot.val());
+          // state.messages.push({ 
+          //   // key: childSnapshot.key, 
+          //   // from: childSnapshot.val().from, 
+          //   // to: childSnapshot.val().to, 
+          //   username: childSnapshot.val().username,
+          //   message: childSnapshot.val().message,
+          //   time: date.toLocaleString("en-US"),
+          // });
         });
 
           // state.messages = messages;
@@ -93,6 +112,29 @@ export default {
     function getUser(id){
       var itemRef = database.ref('users/'+id);
       return itemRef.once('value');
+    }
+
+
+    function getChatKey(){
+        // var ref = database.ref("chats");
+        // return ref.orderByChild('members').on("child_added");
+        // // ref.orderByChild('members').on("child_added", function(snapshot) {
+        // //   if  (_.isEqual(snapshot.val().members, currentUserArray )) _key = snapshot.key;
+        // //   console.log(_key);
+        // // });
+        // console.log('chat key');
+        var ref = database.ref("chats");
+        return ref.orderByChild('members').once("child_added")
+        // .then((snapshot) => {
+        //     // console.log(snapshot.val());
+        //     // console.log(currentUserArray);
+        //     if (_.isEqual(snapshot.val().members, currentUserArray)){
+        //       // console.log(snapshot.key);
+        //       state.chatKey = snapshot.key;
+        //     }
+        //   }
+        // );
+      
     }
 
 
@@ -130,27 +172,58 @@ export default {
 
 
 
-        let _key = null;
+        // let _key = null;
+        // const currentUserArray = [state.currentUser.username, state.contactUser.username];
+        // var ref = database.ref("chats");
+        // ref.orderByChild('members').on("child_added", function(snapshot) {
+        //   if  (_.isEqual(snapshot.val().members, currentUserArray )) _key = snapshot.key;
+        //   console.log(_key);
+        // });
+        
         const currentUserArray = [state.currentUser.username, state.contactUser.username];
-        var ref = database.ref("chats");
-        ref.orderByChild('members').on("child_added", function(snapshot) {
-          if  (_.isEqual(snapshot.val().members, currentUserArray )) _key = snapshot.key;
-          console.log(_key);
+        
+        getChatKey().then((snapshot) => {
+            let _key = snapshot.key;
+            console.log(_key, currentUserArray);
+            if (_.isEqual(snapshot.val().members, currentUserArray)){
+              
+              //message data
+              const msgData = {
+                username: state.currentUser.username,
+                time: Date.now(),
+                message: state.showMessage,
+              };
+
+
+              // const chatKey = snapshot.key;
+              var chatKey = (!_key) ?  database.ref('chats/').push().key : _key;
+              var conversationKey = database.ref(`/messages/${chatKey}/`).push().key;
+              var updates = {};
+              updates[`/chats/${chatKey}/members`] = currentUserArray;
+              updates[`/messages/${chatKey}/${conversationKey}`] = msgData;
+              database.ref().update(updates);
+
+
+              state.showMessage = "";
+
+            }
         });
 
-      
-        const msgData = {
-          username: state.currentUser.username,
-          time: Date.now(),
-          message: state.showMessage,
-        };
+        // console.log(getChatKey);
+        // console.log(state.chatKey);
+        // const msgData = {
+        //   username: state.currentUser.username,
+        //   time: Date.now(),
+        //   message: state.showMessage,
+        // };
 
-        var chatKey = (!_key) ?  database.ref('chats/').push().key : _key;
-        var conversationKey = database.ref(`/messages/${chatKey}/`).push().key;
-        var updates = {};
-        updates[`/chats/${chatKey}/members`] = currentUserArray;
-        updates[`/messages/${chatKey}/${conversationKey}`] = msgData;
-        database.ref().update(updates);
+        // const currentUserArray = [state.currentUser.username, state.contactUser.username];
+        // var chatKey = (!_key) ?  database.ref('chats/').push().key : _key;
+        // var conversationKey = database.ref(`/messages/${chatKey}/`).push().key;
+        // var updates = {};
+        // updates[`/chats/${chatKey}/members`] = currentUserArray;
+        // updates[`/messages/${chatKey}/${conversationKey}`] = msgData;
+        // database.ref().update(updates);
 
 
 
@@ -182,7 +255,7 @@ export default {
 
 
 
-      state.showMessage = "";
+      // state.showMessage = "";
 
       // const user1 = {
       //       username: "admin",
