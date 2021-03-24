@@ -1,5 +1,5 @@
 <template>
-    <router-link to="/contacts">Add Contact</router-link>
+    <router-link to="/contacts">Search Contact</router-link>
     <div class="posts-wrapper">
            <contact-detail v-for="contact in state.contacts" :key="contact.key" :userId="state.userId" :contact="contact" />  <!--  @toggle-favorite="toggleFavorite"/> -->
     </div>

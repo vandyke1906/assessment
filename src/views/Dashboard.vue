@@ -5,14 +5,14 @@
             <p>(@{{ state.user.username }}) </p>
             <div class="badge" v-if="state.user.isAdmin">Admin</div>
             <div class="follower-count">
-                <strong>Followers: </strong> {{ followers }}
+                <strong>Contacts: </strong> {{ state.contactsCount }}
             </div>
 
             <create-post-panel @add-post="addNewPost"/>
         </div>
         
     <div class="posts-wrapper">
-            <post-item v-for="post in state.user.posts" :key="post.key" :username="state.user.username" :post="post" @toggle-favorite="toggleFavorite"/>
+            <post-item v-for="post in state.posts" :key="post.key" :post="post" @delete-post="deletePost" /> <!-- @toggle-favorite="toggleFavorite"-->
     </div>
 
 
@@ -22,6 +22,7 @@
 import { reactive, onMounted } from 'vue';
 // import { useRoute } from 'vue-router';
 import firebase from "firebase";
+import _ from "lodash";
 
 import PostItem from '../components/PostItem';
 import CreatePostPanel from '../components/CreatePostPanel.vue';
@@ -35,13 +36,14 @@ export default {
     setup(){
         //###
         // const route = useRoute();
-      const userId = "userId";
+    //   const userId = nul;
       const database = firebase.database();
 
         //###
         const state = reactive({
-            followers: 0,
-            user: []
+            contactsCount: 0,
+            user: [],
+            posts: [],
         });
 
         //###
@@ -56,10 +58,16 @@ export default {
         //   });
             firebase.auth().onAuthStateChanged( (user) => {
                 if (user) {
+                    
+                    loadPosts(user.uid);
+                        
                     var itemRef = database.ref('users/'+user.uid);
                     itemRef.on('value', (snapshot) => {
                         const data = snapshot.val();
                         state.user = data;
+                        state.user['uid'] = user.uid;
+
+                        // console.log(state.user);
                     });
                 } else {
                 console.log("No User!");
@@ -67,32 +75,88 @@ export default {
             });
         }
 
+        function loadPosts(userId){
+            // console.log(userId);
+            database.ref(`posts/${userId}`).orderByChild("timestamp").on('value', (snapshot) => {
+                let sObj = [];
+                snapshot.forEach(function(ss) {
+                    sObj.push({
+                        key : ss.key,
+                        username: ss.val().username,
+                        timestamp : ss.val().timestamp,//(new Date(ss.val().timestamp)).toLocaleString("en-US"),
+                        content : ss.val().content,
+                        isUpdated: ss.val().isUpdated,
+                    });
+                });
+
+                state.posts = _.orderBy(sObj, "timestamp", "desc");
+
+            // console.log("load",JSON.stringify(state.posts));
+            // console.log("load",JSON.stringify(_.orderBy(state.posts, "timestamp", "desc")));
+            });
+        }
+
+        //events passed on component
         //###
         function toggleFavorite(id){ 
             console.log("Toggle with id " + id);
         }
 
-        //###
         function addNewPost(content){
-            state.user.posts.unshift(
-                {
-                    id: state.user.posts.length +1,
-                    content: content,
-                }
-            )
+            const _post = {
+                username: state.user.username,
+                content: content,
+                timestamp: Date.now(),
+                isUpdated: false,
+            };
+
+            database.ref(`posts/${state.user.uid}`).push(_post);
         }
 
+        // function editPost(key){
+        //     database.ref(`posts/${state.user.uid}/${key}`).on('value', (snapshot) => {
+        //         console.log(snapshot.val().content);
+
+        //     });
+        //     // const _post = {
+        //     //     username: state.user.username,
+        //     //     content: content,
+        //     //     timestamp: Date.now(),
+        //     // };
+        //     // database.ref(`post/${state.user.uid}/${key}`).set(contact);
+
+        //     // alert('Successfully updated contact');
+        // }
+
+         function deletePost(key){
+            if (window.confirm("Do you really want to delete post?")) {
+                // console.log(key);
+                const itemsRef = database.ref(`posts/${state.user.uid}`);
+                itemsRef.child(key).remove().then(() => {  
+                    alert("Post deleted!");
+                })
+                .catch((error) => {
+                    alert(error);
+                    console.error(error);
+                })
+            }
+        }
+
+        
+
+        //###
+        //events passed on component
+
         onMounted(() => {
-          // console.log(firebase.auth().currentUser.uid);
           loadUserDetails();
         })
 
         return {
-            userId,
             state,
             fullName,
             toggleFavorite,
             addNewPost,
+            deletePost,
         };
     }
 }

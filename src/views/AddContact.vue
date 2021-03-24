@@ -4,7 +4,7 @@
             <form @submit.prevent="searchUser">
                 <div class="form-group">
                     <label>Search</label>
-                    <input type="text" class="form-control" placeholder="email address/name" v-model="state.searchString" required>
+                    <input type="text" class="form-control" placeholder="Email Address" v-model="state.searchString" required>
                 </div>
                 <div class="form-group">
                     <button class="btn btn-primary btn-block">Search</button>
@@ -84,7 +84,7 @@ export default {
           });
     }
 
-    
+
     function addContact(user) {
         const _user = {
             email: user.email,

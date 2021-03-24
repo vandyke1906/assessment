@@ -8,6 +8,7 @@ import Register from '@/views/Register'
 import Contacts from '@/views/Contacts'
 import AddContact from '@/views/AddContact'
 import EditContact from '@/views/EditContact'
+import EditPost from '@/views/EditPost'
 
 import firebase from 'firebase';
 
@@ -65,7 +66,12 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: Register
-  }
+  },
+  {
+    path: '/posts/edit/:key',
+    name: 'EditPost',
+    component: EditPost
+  },
   // {
   //   path: '/about',
   //   name: 'About',

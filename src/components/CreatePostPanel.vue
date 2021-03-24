@@ -3,8 +3,8 @@
         <label for="new-post">
             <strong>New Post</strong> ({{newPostCharCount}})
         </label>
-        <textarea id="new-post"  rows="4" v-model="state.postContent"></textarea>
-        <button>Tweet</button>
+        <textarea id="new-post"  rows="5" v-model="state.postContent"></textarea>
+        <button>Post</button>
     </form>
 </template>
 
@@ -24,7 +24,7 @@ export default {
 
         //###
         function createNewPost(){
-            ctx.emit('add-post', state.postContent);
+            ctx.emit('add-post', state.postContent);    //add-post was props in dashboard file
             state.postContent = '';
         }
 
@@ -43,6 +43,11 @@ export default {
     margin-top:10px;
     display: flex;
     flex-direction: column;
+}
+
+button{
+    padding: 5px;
+    margin-top: 10px;
 }
 
 </style>
