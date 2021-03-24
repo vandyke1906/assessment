@@ -7,7 +7,7 @@ import Register from '@/views/Register'
 
 import Contacts from '@/views/Contacts'
 import AddContact from '@/views/AddContact'
-import EditContact from '@/views/EditContact'
+// import EditContact from '@/views/EditContact'
 import EditPost from '@/views/EditPost'
 
 import firebase from 'firebase';
@@ -31,7 +31,7 @@ const routes = [
     name: 'Chat',
     component: Chat,
     meta: {                   // route guard
-      // auth: true,
+      auth: true,
     },
   },
   // {
@@ -45,18 +45,24 @@ const routes = [
   {
     path: '/contacts/list',
     name: 'Contacts',
-    component: Contacts
+    component: Contacts,
+    meta: {                   // route guard
+      auth: true,
+    },
   },
   {
     path: '/contacts',
     name: 'AddContact',
-    component: AddContact
+    component: AddContact,
+    meta: {                   // route guard
+      auth: true,
+    }
   },
-  {
-    path: '/contacts/edit/:id',
-    name: 'EditContact',
-    component: EditContact
-  },
+  // {
+  //   path: '/contacts/edit/:id',
+  //   name: 'EditContact',
+  //   component: EditContact
+  // },
   {
     path: '/settings',
     name: 'Settings',
