@@ -2,8 +2,8 @@
   <div id="app">
     <!-- Chat section -->
     <div class="message-body mt-3">
-      <h3>Chat</h3>
-      <h5>Welcome {{ state.name }}!</h5>
+      <h3>Chat with {{ state.contactUser.username }}</h3>
+      <h5>Welcome {{ state.currentUser.username }}!</h5>
       <div class="card">
         <div class="card-body">
           <div
@@ -28,15 +28,17 @@
 import firebase from "firebase";
 import { useRoute } from "vue-router";
 import { reactive, onMounted } from "vue";
+import _ from "lodash";
 
 export default {
   setup(){
-    
     const route = useRoute();
     // const router = useRouter();
     const state = reactive({
-      from: "-MWWyf1bW1ib3anKqywc",
-      to: "",
+      // from: "-MWWyf1bW1ib3anKqywc",
+      // to: "",
+      currentUser: [],
+      contactUser: [],
       showMessage: "",
       messages: [],
     });
@@ -48,8 +50,21 @@ export default {
     // mounted
     onMounted(() => {      
       state.to = route.params.key;
+      // getUser(route.params.key);
 
-      getUser(route.params.key);
+      //console.log(firebase.auth().currentUser.uid);
+      const currentUid = firebase.auth().currentUser.uid;
+
+      getUser(currentUid).then((snapshot) => {
+          state.currentUser = snapshot.val(); 
+        }
+      );
+
+      getUser(route.params.key).then((snapshot) => {
+          state.contactUser = snapshot.val(); 
+        }
+      );
+      
 
       messaging.getToken();
       // console.log('token do usuário:', token);
@@ -61,10 +76,11 @@ export default {
           var date = new Date(childSnapshot.val().time);
           // console.log(childSnapshot.val());
           state.messages.push({ 
-            key: childSnapshot.key, 
-            from: childSnapshot.val().from, 
-            to: childSnapshot.val().to, 
-            text: childSnapshot.val().text,
+            // key: childSnapshot.key, 
+            // from: childSnapshot.val().from, 
+            // to: childSnapshot.val().to, 
+            username: childSnapshot.val().username,
+            message: childSnapshot.val().message,
             time: date.toLocaleString("en-US"),
           });
         });
@@ -75,23 +91,94 @@ export default {
     })
 
     function getUser(id){
-      console.log(id);
       var itemRef = database.ref('users/'+id);
-      itemRef.on('value', (snapshot) => {
-          const data = snapshot.val();
-          // state.contact = data;
-          console.log(data);
-      });
+      return itemRef.once('value');
     }
+
+
+
+
     
     function sendMessage() {
-      const message = {
-        from: state.from,
-        to: state.to,
-        time: Date.now(),
-        text: state.showMessage,
-      };
-      database.ref('messages').push(message);
+      
+      // // const chatData = {username: state.currentUser.username, username: state.contactUser.username};
+      // const chatData = [state.currentUser.username, state.contactUser.username];
+     
+      // const msgData = {
+      //   username: state.currentUser.username,
+      //   time: Date.now(),
+      //   message: state.showMessage,
+      // };
+
+      // var chatKey = database.ref('chats/').push().key;
+      // var conversationKey = database.ref(`/messages/${chatKey}/`).push().key;
+      // var updates = {};
+      // updates[`/chats/${chatKey}/members`] = chatData;
+      // updates[`/messages/${chatKey}/${conversationKey}`] = msgData;
+      // database.ref().update(updates);
+
+
+
+        // const  itemsRef = database.ref("members");
+        // itemsRef.on('child_added', (snapshot) => {
+        //     snapshot.forEach(function(obj) {
+        //       console.log(obj.val());
+        //       // _.isEqual();
+        //     });
+
+        //   });
+
+
+
+        let _key = null;
+        const currentUserArray = [state.currentUser.username, state.contactUser.username];
+        var ref = database.ref("chats");
+        ref.orderByChild('members').on("child_added", function(snapshot) {
+          if  (_.isEqual(snapshot.val().members, currentUserArray )) _key = snapshot.key;
+          console.log(_key);
+        });
+
+      
+        const msgData = {
+          username: state.currentUser.username,
+          time: Date.now(),
+          message: state.showMessage,
+        };
+
+        var chatKey = (!_key) ?  database.ref('chats/').push().key : _key;
+        var conversationKey = database.ref(`/messages/${chatKey}/`).push().key;
+        var updates = {};
+        updates[`/chats/${chatKey}/members`] = currentUserArray;
+        updates[`/messages/${chatKey}/${conversationKey}`] = msgData;
+        database.ref().update(updates);
+
+
+
+
+      // const  itemsRef = database.ref("chats").orderByChild("email").startAt(queryText).endAt(queryText+"\uf8ff")
+
+      // const msgData = {
+      //   // from: state.from,
+      //   // to: state.to,
+      //   username: state.currentUser.username,
+      //   time: Date.now(),
+      //   message: state.showMessage,
+      // };
+
+      // database.ref('messages').set(msgData);
+      //database.ref('messages/').set(msgData);
+      
+      // Get a key for a new Post.
+      // database.ref().child('messages').push(msgData).key;
+      // var newMsgKey = 
+      // database.ref('messages').push(msgData).key;
+      // var updates = {};
+      // updates['/messages/' + newMsgKey] = msgData;
+      // // updates['/posts/' + newPostKey] = postData;
+      // // updates['/user-posts/' + uid + '/' + newPostKey] = postData;
+
+      // firebase.database().ref().update(updates);
+
 
 
 

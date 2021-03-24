@@ -2,18 +2,23 @@
     <!-- <div class="contact-item" @click="mfavoritecontact(contact.id)"> -->
     <div class="contact-item">
         <div class="contact">
-            <div class="user">
-                <strong> @{{ username }} </strong>
+            <div class="contact-header">
+                <strong> @{{ contact.username }} </strong>
             </div>
             <div class="contact-content">
-                {{ contact.content }}
+                {{ contact.fullName }}
             </div>
+            <div class="contact-footer">
+                {{ contact.email }}
+            </div>
+            
+            <router-link :to="{ name:'Chat', params: { key: contact.key }}">Chat </router-link> 
         </div>
     </div>
 </template>
 
 <script>
-import { } from 'vue';
+import {  } from 'vue';
 export default {
     name: "contactItem",
     props: {  
@@ -21,11 +26,6 @@ export default {
         contact: {type: Object, required: true,}
     },
     setup(){
-        //###
-        // function mfavoritecontact(id){
-        //     ctx.emit('toggle-favorite', id);
-        // }
-
         return {
             // mfavoritecontact,
         }

@@ -1,11 +1,12 @@
 <template>
 <div id="nav">
-  <router-link to="/">Login</router-link> |
-  <router-link to="/register">Register</router-link> |
-  <router-link to="/dashboard">Dashboard</router-link> |
-  <router-link to="/contacts/list">Contacts</router-link> |
+  <router-link to="/dashboard"> Dashboard </router-link> 
+  <router-link to="/contacts/list"> Contacts </router-link> 
   <!-- <router-link to="/chat">Chat</router-link> | -->
-  <button @click="logout">Logout</button>
+  <a href="#" @click="logout"> Logout </a> |
+
+  <router-link to="/"> Login </router-link> 
+  <router-link to="/register"> Register </router-link> 
 </div>
 
   <router-view />
@@ -26,7 +27,7 @@ export default {
           .auth()
           .signOut()
           .then(() => {
-              alert('Successfully logged out');
+              // alert('Successfully logged out');
                router.push({ name: "login" });
           })
           .catch(error => {
@@ -42,7 +43,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -53,6 +54,11 @@ export default {
 
 #nav {
   padding: 30px;
+  
+  & a{
+    padding: 10px;
+    text-decoration: none;
+  }
 }
 
 #nav a {

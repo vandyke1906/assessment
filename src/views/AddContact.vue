@@ -1,29 +1,6 @@
 <template>
 <div class="row justify-content-center">
-        <div class="col-md-5">
-            <h3 class="text-center">Add Contact</h3>
-            <form @submit.prevent="addContact">
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" class="form-control" v-model="state.contact.name" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" class="form-control" v-model="state.contact.email" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Phone</label>
-                    <input type="text" class="form-control" v-model="state.contact.phone" required>
-                </div>
-
-                <div class="form-group">
-                    <button class="btn btn-primary btn-block">Add Contact</button>
-                </div>
-            </form>
-
-            <h3 class="text-center">Add Contact</h3>
+        <h3 class="text-center">Add Contact</h3>
             <form @submit.prevent="searchUser">
                 <div class="form-group">
                     <label>Search</label>
@@ -45,19 +22,16 @@
                         </thead>
                         <tbody>
                             <tr v-for="user in state.users" :key="user.key">
-                                <td>{{ user.firstName }} {{ user.lastName }}</td>
+                                <td>{{ user.fullName }}</td>
                                 <td>{{ user.email }}</td>
                                 <td>
-                                    <button @click.prevent="addContact1(user)" class="btn btn-danger">Add</button>
+                                    <button @click.prevent="addContact(user)" class="btn btn-danger">Add</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
             </div>
 
-
-
-        </div>
     </div>
 </template>
 
@@ -89,15 +63,7 @@ export default {
         const  itemsRef = database.ref("users").orderByChild("email").startAt(queryText).endAt(queryText+"\uf8ff")
 
           itemsRef.on('value', (snapshot) => {
-            //   state.users = data;
-
-            // let _users = [];
-            // _.forEach( snapshot_values, function(value, key) {
-            //     const _user = {
-            //         key: _key,
-            //     };
-            //     _users.push(_user);
-            // });
+   
 
             let _users = [];
             snapshot.forEach(function(obj) {
@@ -113,28 +79,13 @@ export default {
 
             _.filter(snapshot.val(), function(obj) {
                 return obj.email != firebase.auth.email ; 
-            }); //snapshot.val();
-            // state.users = _users;
+            }); 
 
           });
     }
 
-    function addContact() {
-      const contact = {
-            name: state.contact.name,
-            email: state.contact.email,
-            phone: state.contact.phone,
-      };
-      firebase
-        .database()
-        .ref("contacts")
-        .push(contact);
-
-        alert('Successfully added contact');
-        router.push({ name: "Contacts" });
-    }
-
-    function addContact1(user) {
+    
+    function addContact(user) {
         const _user = {
             email: user.email,
             fullName: user.fullName,
@@ -151,7 +102,6 @@ export default {
     return{
       state,
       addContact,
-      addContact1,
       searchUser,
     }
   }

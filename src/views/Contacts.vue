@@ -64,41 +64,32 @@ export default {
         }
     }
 
-    function loadContacts(){
+    function loadContacts(userId){
         state.contacts = [];
-        // const uid = state.userid;
-        const itemRef = firebase.database().ref(`contacts/s`);
+        const itemRef = firebase.database().ref(`contacts/${userId}`);
 
          itemRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            console.log(data);
-            state.contacts = data;
+            // const data = snapshot.val();
+            // state.contacts = data;
+            let _contacts = [];
+            snapshot.forEach(function(obj) {
+                 const _contact = { 
+                    key: obj.key, 
+                    username: obj.val().username, 
+                    fullName: obj.val().fullName, 
+                    email: obj.val().email, 
+                }
+                _contacts.push(_contact);
+            });
+            state.contacts = _contacts;
+
         });
-        // itemsRef.once('value', function(snapshot) {
-        //     // var messages = [];
-
-        //     snapshot.forEach(function(childSnapshot) {
-        //         // var key = childSnapshot.key;
-        //         // var data = childSnapshot.val();
-        //         // console.log(key, data);
-                
-        //          state.contacts.push({
-        //             key: childSnapshot.key,
-        //             name: childSnapshot.val().name,
-        //             email: childSnapshot.val().email,
-        //             phone: childSnapshot.val().phone
-        //         });
-        //     });
-
-        //     // console.log(state.contacts);
-        
-        // });
     }
 
     onMounted(() => {
-        // state.userid = firebase.auth().currentUser.uid;
         // console.log(firebase.auth().currentUser.uid);
-        loadContacts();
+        const userId = firebase.auth().currentUser.uid;
+        loadContacts(userId);
     })
 
     return{

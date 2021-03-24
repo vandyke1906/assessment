@@ -73,7 +73,7 @@ export default {
         }
 
         onMounted(() => {
-          console.log(firebase.auth().currentUser.uid);
+          // console.log(firebase.auth().currentUser.uid);
           loadUserDetails();
         })
 

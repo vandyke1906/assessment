@@ -36,12 +36,11 @@ export default {
     });
 
     function login() {
-      console.log(state.email);
       firebase
         .auth()
         .signInWithEmailAndPassword(state.email, state.password)
         .then(() => {
-          alert('Successfully logged in');
+          // alert('Successfully logged in');
           router.push({ name: "Dashboard" });
         })
         .catch(error => {
