@@ -1,7 +1,7 @@
 <template>
     <div class="user-profile">
         <div class="user-panel">
-            <h1> {{ fullName }}</h1>
+            <h1> {{ state.user.fullName }}</h1>
             <p>(@{{ state.user.username }}) </p>
             <div class="badge" v-if="state.user.isAdmin">Admin</div>
             <div class="follower-count">

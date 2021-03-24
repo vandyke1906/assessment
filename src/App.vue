@@ -1,12 +1,13 @@
 <template>
 <div id="nav">
-  <router-link to="/dashboard"> Dashboard </router-link> 
-  <router-link to="/contacts/list"> Contacts </router-link> 
-  <!-- <router-link to="/chat">Chat</router-link> | -->
-  <a href="#" @click="logout"> Logout </a> |
+    <router-link to="/dashboard"> Dashboard </router-link> 
+    <router-link to="/contacts/list"> Contacts </router-link> 
+    <!-- <router-link to="/chat">Chat</router-link> | -->
+    <a href="#" @click="logout"> Logout </a> |
 
-  <router-link to="/"> Login </router-link> 
-  <router-link to="/register"> Register </router-link> 
+
+    <router-link to="/"> Login </router-link> 
+    <router-link to="/register" > Register </router-link> 
 </div>
 
   <router-view />
@@ -16,9 +17,14 @@
 <script>
 import firebase from 'firebase';
 import { useRouter } from "vue-router";
+import { reactive } from 'vue';
 
 export default {
     setup(){
+
+      const state = reactive({
+        isLoggedOut: false,
+      });
       
       const router = useRouter();
     
@@ -37,6 +43,7 @@ export default {
         }
 
       return {
+        state,
         logout,
       }
     }

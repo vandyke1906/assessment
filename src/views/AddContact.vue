@@ -63,7 +63,6 @@ export default {
         const  itemsRef = database.ref("users").orderByChild("email").startAt(queryText).endAt(queryText+"\uf8ff")
 
           itemsRef.on('value', (snapshot) => {
-   
 
             let _users = [];
             snapshot.forEach(function(obj) {
