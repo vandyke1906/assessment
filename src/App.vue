@@ -1,6 +1,7 @@
 <template>
 <div id="nav">
     <router-link to="/dashboard"> Dashboard </router-link> 
+    <router-link to="/chats"> Chats </router-link> 
     <router-link to="/contacts/list"> Contacts </router-link> 
     <!-- <router-link to="/chat">Chat</router-link> | -->
     <a href="#" @click="logout"> Logout </a> |

@@ -1,11 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Dashboard from '@/views/Dashboard'
+import ChatOld from '@/views/ChatOld'
 import Chat from '@/views/Chat'
 import Login from '@/views/Login'
 import Settings from '@/views/Settings'
 import Register from '@/views/Register'
 
 import Contacts from '@/views/Contacts'
+import SearchContacts from '@/views/SearchContacts'
 import AddContact from '@/views/AddContact'
 // import EditContact from '@/views/EditContact'
 import EditPost from '@/views/EditPost'
@@ -27,9 +29,17 @@ const routes = [
     },
   },
   {
+    path: '/chats',
+    name: 'Chats',
+    component: Chat,
+    meta: {                   // route guard
+      auth: true,
+    },
+  },
+  {
     path: '/chat/:key',
     name: 'Chat',
-    component: Chat,
+    component: ChatOld,
     meta: {                   // route guard
       auth: true,
     },
@@ -49,6 +59,14 @@ const routes = [
     meta: {                   // route guard
       auth: true,
     },
+  },
+  {
+    path: '/search-contacts',
+    name: 'SearchContacts',
+    component: SearchContacts,
+    meta: {                   // route guard
+      auth: true,
+    }
   },
   {
     path: '/contacts',

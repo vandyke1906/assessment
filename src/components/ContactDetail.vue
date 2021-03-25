@@ -11,8 +11,9 @@
             <div class="contact-footer">
                 {{ contact.email }}
             </div>
-            
-            <router-link :to="{ name:'Chat', params: { key: contact.key }}">Chat </router-link> 
+            <button @click.prevent="addContact" class="btn btn-danger" v-if="(mode =='search')">Add to my contact</button>
+
+            <router-link :to="{ name:'Chat', params: { key: contact.key }}" v-if="(mode !='search')">Chat </router-link> 
         </div>
     </div>
 </template>
@@ -23,11 +24,17 @@ export default {
     name: "contactItem",
     props: {  
         userId: { type: String, required: true },
+        mode: { type: String, default: "contact" },
         contact: {type: Object, required: true,}
     },
-    setup(){
+    setup(props, ctx){
+
+        function addContact(){
+            ctx.emit('add-contact', props.contact);    //add-post was props in dashboard file
+        }
+
         return {
-            // mfavoritecontact,
+            addContact,
         }
     }
 }

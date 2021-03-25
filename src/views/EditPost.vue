@@ -49,7 +49,7 @@ export default {
 
         function loadPost(uid){
             database.ref(`posts/${uid}/${route.params.key}`).on('value', (snapshot) => {
-                console.log(snapshot.val().content);
+                // console.log(snapshot.val().content);
                 state.postContent = snapshot.val().content;
             });
         }

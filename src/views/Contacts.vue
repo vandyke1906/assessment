@@ -1,32 +1,9 @@
 <template>
-    <router-link to="/contacts">Search Contact</router-link>
+    <router-link :to="{name: 'SearchContacts' }">Search Contact</router-link>
     <div class="posts-wrapper">
+            <h1>My Contacts</h1>
            <contact-detail v-for="contact in state.contacts" :key="contact.key" :userId="state.userId" :contact="contact" />  <!--  @toggle-favorite="toggleFavorite"/> -->
     </div>
-    <!-- <div class="row">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="contact in state.contacts" :key="contact.key">
-                        <td>{{ contact.name }}</td>
-                        <td>{{ contact.email }}</td>
-                        <td>{{ contact.phone }}</td>
-                        <td>
-                            <router-link :to="{ name:'Chat', params: { key: contact.key }}">Chat </router-link> 
-                            <router-link :to="{name: 'EditContact', params: { id: contact.key }}" class="btn btn-primary">Edit </router-link>
-                            <button @click.prevent="deleteContact(contact.key)" class="btn btn-danger">Delete</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-    </div> -->
 </template>
 
 <script>
