@@ -4,6 +4,7 @@ import router from './router'
 
 import firebase from "firebase";
 
+
 var firebaseConfig = {
     apiKey: "AIzaSyAnH6PWV3E6pB81Jpv_4MOJNzJRexbzib4",
     authDomain: "simple-app-dbdd8.firebaseapp.com",
@@ -16,21 +17,17 @@ var firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-const registerServiceWorker = () => {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker
-      .register('./firebase-messaging-sw.js')
-      .then(function (registration) {
-        console.log('Registration successful, scope is:', registration.scope);
-      })
-      .catch(function (err) {
-        console.log('Service worker registration failed, error:', err);
-      });
-  }
-};
-registerServiceWorker();
+const database = firebase.firestore();
 
-// Vue.config.productionTip = false;
+database.settings({
+  timestampsInSnapshots: true
+});
+
+database.enablePersistence();
+
+// const userCollection = database.collection("users");
+
+// userCollection.add(_user);
 
 
 createApp(App).use(router).mount('#app')

@@ -24,8 +24,11 @@ import { reactive, onMounted } from 'vue';
 import firebase from "firebase";
 import _ from "lodash";
 
+
 import PostItem from '../components/PostItem';
 import CreatePostPanel from '../components/CreatePostPanel.vue';
+
+import { _selectDoc, _insertDocCollection } from "@/libs/";
 
 export default {
     name: "UserProfile",
@@ -38,6 +41,7 @@ export default {
         // const route = useRoute();
     //   const userId = nul;
       const database = firebase.database();
+    //   const messaging = firebase.messaging();
 
         //###
         const state = reactive({
@@ -50,51 +54,54 @@ export default {
         const fullName = `Ronie Penara`;
 
         function loadUserDetails(){
-        //   let userId = firebase.auth().currentUser.uid;
-        //   var itemRef = database.ref('users/'+userId);
-        //   itemRef.on('value', (snapshot) => {
-        //       const data = snapshot.val();
-        //       state.user = data;
-        //   });
             firebase.auth().onAuthStateChanged( (user) => {
                 if (user) {
                     
-                    loadPosts(user.uid);
+                    selectUser(user.uid);
+                    console.log(_.toUpper(user.uid));
+                    // loadPosts(user.uid);
+                    // loadPosts(user.uid);
                         
-                    var itemRef = database.ref('users/'+user.uid);
-                    itemRef.on('value', (snapshot) => {
-                        const data = snapshot.val();
-                        state.user = data;
-                        state.user['uid'] = user.uid;
+                    // var itemRef = database.ref('users/'+user.uid);
+                    // itemRef.on('value', (snapshot) => {
+                    //     const data = snapshot.val();
+                    //     state.user = data;
+                    //     state.user['uid'] = user.uid;
 
-                        // console.log(state.user);
-                    });
+                    //     // console.log(state.user);
+                    // });
                 } else {
                 console.log("No User!");
                 }
             });
         }
 
-        function loadPosts(userId){
-            // console.log(userId);
-            database.ref(`posts/${userId}`).orderByChild("timestamp").on('value', (snapshot) => {
-                let sObj = [];
-                snapshot.forEach(function(ss) {
-                    sObj.push({
-                        key : ss.key,
-                        username: ss.val().username,
-                        timestamp : ss.val().timestamp,//(new Date(ss.val().timestamp)).toLocaleString("en-US"),
-                        content : ss.val().content,
-                        isUpdated: ss.val().isUpdated,
-                    });
-                });
-
-                state.posts = _.orderBy(sObj, "timestamp", "desc");
-
-            // console.log("load",JSON.stringify(state.posts));
-            // console.log("load",JSON.stringify(_.orderBy(state.posts, "timestamp", "desc")));
+        function selectUser(key){
+            _selectDoc("users", key).then((snapshot) => {
+                state.user = snapshot.data();
+                state.user['uid'] = key;
             });
         }
+
+        // function loadPosts(userId){
+            
+        //     // _selectDoc("posts", userId);
+        //     // console.log(_.toUpper(userId));
+        //     /* database.ref(`posts/${userId}`).orderByChild("timestamp").on('value', (snapshot) => {
+        //         let sObj = [];
+        //         snapshot.forEach(function(ss) {
+        //             sObj.push({
+        //                 key : ss.key,
+        //                 username: ss.val().username,
+        //                 timestamp : ss.val().timestamp,//(new Date(ss.val().timestamp)).toLocaleString("en-US"),
+        //                 content : ss.val().content,
+        //                 isUpdated: ss.val().isUpdated,
+        //             });
+        //         });
+
+        //         state.posts = _.orderBy(sObj, "timestamp", "desc");
+        //     }); */
+        // }
 
         //events passed on component
         //###
@@ -106,11 +113,13 @@ export default {
             const _post = {
                 username: state.user.username,
                 content: content,
-                timestamp: Date.now(),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),//Date.now(),
                 isUpdated: false,
             };
 
-            database.ref(`posts/${state.user.uid}`).push(_post);
+            _insertDocCollection("posts", state.user.uid, _post);
+
+            // database.ref(`posts/${state.user.uid}`).push(_post);
         }
 
         // function editPost(key){
@@ -149,6 +158,7 @@ export default {
 
         onMounted(() => {
           loadUserDetails();
+
         })
 
         return {

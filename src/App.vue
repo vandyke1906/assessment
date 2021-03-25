@@ -10,6 +10,8 @@
     <router-link to="/register" > Register </router-link> 
 </div>
 
+  <notification-box />
+
   <router-view />
   
 </template>
@@ -18,15 +20,29 @@
 import firebase from 'firebase';
 import { useRouter } from "vue-router";
 import { reactive } from 'vue';
+import NotificationBox from '@/components/NotificationBox.vue';
+
+// import { insertDB } from '@/libs/';
+// import _database from '@/libs/';
 
 export default {
+    components: {
+        NotificationBox,
+    }, 
     setup(){
-
       const state = reactive({
         isLoggedOut: false,
       });
       
       const router = useRouter();
+
+      // const _user = {
+      //   email: "additional@test.com",
+      //   fullname: "adssad as dsad",
+      //   username: "vandyke1906"
+      // }
+      
+      // insertDB("users", _user);
     
       function logout() {
         firebase

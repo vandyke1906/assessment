@@ -35,6 +35,7 @@
 import firebase from "firebase";
 import { reactive } from "vue";
 import { useRouter } from "vue-router";
+// import { _insertDoc } from '@/libs/'
 
 export default {
   setup(){
@@ -52,16 +53,18 @@ export default {
       .auth()
       .createUserWithEmailAndPassword(state.email, state.password)
       .then(() => {
+
         var _uid = firebase.auth().currentUser.uid;
-        alert('Successfully registered! Please login.');
-        //add in database
         const _user = {
           username: state.username,
           fullName: state.fullName,
           email: state.email,
         };
 
+        // _insertDoc("users", _uid, _user);
         firebase.database().ref(`users/${_uid}`).set(_user);
+        alert('Successfully registered! Please login.');
+
 
         router.push({ name: "Dashboard" });
       })
